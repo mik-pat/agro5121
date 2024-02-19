@@ -1,0 +1,220 @@
+---
+title: "Inclass_ch6_anova"
+output: html_document
+date: "2024-02-18"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Install packages if not already installed
+packages <- c("nlme", "lme4", "multcomp", "emmeans", "agricolae", "multcompView", "ggplot2", "lattice", "ggpubr", "plotly", "car", "agricolae","emmeans")
+new_packages <- packages[!(packages %in% installed.packages()[,"Package"])]
+if(length(new_packages)) install.packages(new_packages)
+
+# Load the libraries
+#library(nlme)     # For linear and nonlinear mixed-effects models
+#library(lme4)     # For linear mixed models and generalized linear mixed models
+# No need to load a library for aov() and lm() as they are part of base R
+library(car)
+library(emmeans)
+library(multcomp)
+library(multcompView) # For conducting post-hoc tests and general hypotheses testing
+library(emmeans)  # For post-hoc analysis and estimation of marginal means
+library(agricolae) # For multiple comparisons and group separations
+
+library(ggplot2)  # For data visualization
+library(lattice)  # For multi-panel graphics
+library(ggpubr)   # For creating publication-ready plots
+library(plotly)   # For interactive visualizations
+
+# Note: This script assumes a connection to the internet to install packages.
+# After installation, packages are loaded into the R session for use.
+
+```
+
+#table 4.4: Problem 4 pg 101
+The experiment was run to compare the effects of auditory and visual cues on 
+speed of response of a human subject. A personal computer was used to present 
+a “stimulus” to a subject, and the reaction time required for the subject to 
+press a key was monitored. The subject was warned that the stimulus was 
+forthcoming by means of an auditory or a visual cue. The experimenters were 
+interested in the effects on the subjects’ reaction time of the auditory and 
+visual cues and also in different elapsed times between cue and stimulus. Thus,
+there were two different treatment factors: “cue stimulus” at two levels 
+“auditory” or “visual,” and “elapsed time between cue and stimulus” at three 
+levels “five,” “ten,” or “fifteen” seconds. This gave a total of six treatment
+combinations, which can be coded as:
+
+```{r}
+# Recreating the data frame from the provided image
+rt_df <- data.frame(
+  rep = c(1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3),
+  trt = factor(rep(c("aud", "aud", "aud", "vis", "vis", "vis"), each = 3)),
+  time = rep(c(5, 10, 15), times = 6),
+  respon_time_sec = c(0.204, 0.17, 0.181, 0.167, 0.182, 0.187,
+                      0.202, 0.198, 0.236, 0.257, 0.279, 0.269,
+                      0.283, 0.235, 0.26, 0.256, 0.281, 0.258)
+)
+rt_df$time <- factor(rt_df$time)
+print(rt_df)
+## Summarize the data to QC
+summary(rt_df)
+
+## Check the structure of the data frame
+str(rt_df)
+
+# Boxplot to explore response times across treatment groups
+boxplot(respon_time_sec ~ trt, data = rt_df, main = "Response Time by Treatment",
+        xlab = "Treatment", ylab = "Response Time (sec)", col = "lightblue")
+
+# Boxplot to explore response times across time groups
+boxplot(respon_time_sec ~ time, data = rt_df, main = "Response Time by Time",
+        xlab = "Time", ylab = "Response Time (sec)", col = "lightblue")
+```
+
+```{r}
+# Two-way ANOVA
+aov_res <- aov(respon_time_sec ~ trt * time, data = rt_df)
+
+# Calculate standardized residuals
+aov_res_std_res <- rstandard(aov_res)
+
+# Calculate fitted (predicted) values
+aov_res_fitted <- fitted(aov_res)
+
+# Base R plot for standardized residuals vs. fitted values
+plot(aov_res_fitted, aov_res_std_res, xlab = "Fitted Values", ylab = "Standardized Residuals",
+     main = "Standardized Residuals vs. Fitted Values")
+abline(h = 0, col = "red")
+
+# Create a data frame for plotting
+residuals_data <- data.frame(StandardizedResiduals = aov_res_std_res, FittedValues = aov_res_fitted)
+
+# ggplot2 for standardized residuals vs. fitted values
+ggplot(residuals_data, aes(x = FittedValues, y = StandardizedResiduals)) +
+  geom_point() +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Fitted Values", y = "Standardized Residuals",
+       title = "Standardized Residuals vs. Fitted Values") +
+  theme_minimal()
+
+# Normality check with Shapiro-Wilk test
+shapiro.test(rt_df$respon_time_sec)
+
+# Homogeneity of variances with Levene's Test
+leveneTest(respon_time_sec ~ trt * time, data = rt_df)
+```
+
+
+```{r}
+summary(aov_res)
+# Post-hoc tests
+# Fisher's LSD
+fisher_lsd <- LSD.test(res.aov, "trt", p.adj = "none")
+print(fisher_lsd$groups)
+
+# Tukey's HSD
+tukey_hsd <- TukeyHSD(res.aov, "trt:time", conf.level = 0.95)
+print(tukey_hsd)
+```
+
+```{r}
+# Data visualization
+# Interaction plot
+interaction.plot(x.factor = rt_df$time, trace.factor = rt_df$trt, 
+                 response = rt_df$respon_time_sec,
+                 main = "Interaction Plot", xlab = "Time", ylab = "Response Time (sec)",
+                 trace.label = "Treatment", fixed = TRUE)
+
+# Boxplot of response times by treatment and time
+ggplot(rt_df, aes(x = interaction(trt, time), y = respon_time_sec, fill = trt)) +
+  geom_boxplot() +
+  labs(title = "Response Times by Treatment and Time", x = "Treatment-Time Combination", y = "Response Time (sec)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Save the plot if needed
+ggsave("boxplot_treatment_time.png", width = 10, height = 6, dpi = 300)
+```
+
+#In Class Work Data 1 - We do this one
+```{r}
+# Create the data frame for a 2 x 3 factorial design with 4 replicates
+set.seed(42)  # Setting seed for reproducibility
+
+# Define levels for Factor A and Factor B
+factor_a_levels <- c("A1", "A2")
+factor_b_levels <- c("B1", "B2", "B3")
+
+# Create a data frame using expand.grid to get all combinations of the factorial design
+factorial_design <- expand.grid(
+  FactorA = factor_a_levels,
+  FactorB = factor_b_levels,
+  Rep = 1:4
+)
+
+# Generate response variable with interaction
+# We'll simulate some data that shows an interaction between the two factors
+factorial_design$Response <- with(factorial_design, 
+                                  rnorm(nrow(factorial_design), 
+                                        mean = ifelse(FactorA == "A1", 10, 15) +
+                                          ifelse(FactorB == "B1", 0, ifelse(FactorB == "B2", 5, 10)), 
+                                        sd = 1))
+
+```
+
+```{r}
+summary(factorial_design)
+factorial_plot <- aov(Response ~ FactorA * FactorB, data = factorial_design)
+plot(factorial_plot)
+
+model <- lm(Response ~ FactorA * FactorB, data = factorial_design)
+
+# Normality test
+shapiro.test(rstandard(model))
+# I think this passes normality test?
+
+```
+
+
+#Inclass Data 2
+```{r}
+# Set the seed for reproducibility
+set.seed(42)
+
+# Define the levels for Factor A and Factor B
+factor_a_levels1 <- c("A1", "A2")
+factor_b_levels1 <- c("B1", "B2", "B3")
+
+# Create a data frame with all combinations of Factor A and Factor B for 4 replicates
+factorial_design1 <- expand.grid(
+  FactorA1 = factor_a_levels1,
+  FactorB1 = factor_b_levels1,
+  Rep = 1:4
+)
+
+# Generate response variable with a strong interaction effect
+# We will make the response for the combination of A2 and B3 much higher to emphasize interaction
+factorial_design1$Response <- with(factorial_design1, 
+                                  5 + 
+                                  (as.numeric(FactorA1)-1) * 5 +
+                                  (as.numeric(FactorB1-1) * 2 +
+                                  (as.numeric(FactorA1)-1) * (as.numeric(FactorB1)-1) * 5 +
+                                  rnorm(nrow(factorial_design1), mean = 0, sd = 1))
+
+
+```
+
+```{r}
+summary(factorial_design1)
+factorial_plot1 <- aov(Response1 ~ FactorA1 * FactorB1, data = factorial_design)
+plot(factorial_plot1)
+```
+
+
+```
+
+
+
