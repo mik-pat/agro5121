@@ -5,6 +5,7 @@ library(emmeans)
 library(ggplot2)
 library(psych)
 library(agricolae)
+library(xtable)
 
 # Question 1 Zinc Plating
 
@@ -26,5 +27,5 @@ headTail(block_rand)
 trt_2 = c("1","2","3","4","5","6")
 block_rand_2 <- design.rcbd(trt_2, 4, serie=0, seed=0)
 block_rand_2
-
-
+export_table <- xtable(block_rand_2$sketch, auto=TRUE)
+print(export_table, type="latex")
