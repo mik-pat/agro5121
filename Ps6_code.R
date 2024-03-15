@@ -63,3 +63,18 @@ ggplot() +
   geom_qq(aes(sample = rstandard(res_model))) +
   geom_abline(color = "red") +
   coord_fixed()
+
+
+# Anova of model 
+res_model %>% anova()
+
+# Anova regular style
+aov_blocked <- aov(Response ~ Protocol + Subject, data = resp_long)
+aov_un <- aov(Response ~ Protocol, data= resp_long)
+aov_subj <- aov(Response ~ Subject, data = resp_long)
+
+summary(aov_blocked)
+# Export table in LaTeX format
+print(xtable(anova(aov_blocked)))
+summary(aov_un)
+summary(aov_subj)
