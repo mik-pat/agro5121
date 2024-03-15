@@ -44,7 +44,7 @@ summary(resp_ex)
 resp_long <- pivot_longer(resp_ex, !Protocol, names_to ="Subject", values_to="Response")
 #QC Data & Check Assumptions
 summary(resp_long)
-res_model <-lm(Response ~ Protocol, resp_long)
+res_model <-lm(Response ~ Protocol + Subject, resp_long)
 plot(res_model)
 
 # Get Residuals
