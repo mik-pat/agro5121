@@ -40,3 +40,26 @@ resp_ex <- data.frame(Protocol = c(1,2,3,4,5,6,7,8,9),
                       Subject_3= c(.83, .81, .88, .79, .88, .86, .71, .78, .72))
 resp_ex$Protocol <- as.factor(resp_ex$Protocol)
 summary(resp_ex)
+# Make long format
+resp_long <- pivot_longer(resp_ex, !Protocol, names_to ="Subject", values_to="Response")
+#QC Data & Check Assumptions
+summary(resp_long)
+res_model <-lm(Response ~ Protocol, resp_long)
+plot(res_model)
+
+# Get Residuals
+res_stnd <- rstandard(res_model)
+
+# Plot'em
+plot(res_stnd)
+
+#Common variance looks good? Nothing past 2, not really flared
+plot(res_stnd, type = "b", main = "Standardized Residuals",
+     xlab = "Observation Index", ylab = "Standardized Residuals")
+abline(h = 0, col = "red")
+
+# QQ for normality - a little wonky, at least one weird outlier at the high end
+ggplot() +
+  geom_qq(aes(sample = rstandard(res_model))) +
+  geom_abline(color = "red") +
+  coord_fixed()
