@@ -26,7 +26,6 @@ print(export_table1, type="latex")
 # Using Agricolae
 
 # Part 2
-# In result DF, blocks 1 & 2 make up the first run, blocks 3 & 4 make up the second
 trt_2 = c("1","2","3","4","5","6")
 block_rand_2 <- design.rcbd(trt_2, 4, serie=0, seed=0)
 block_rand_2
