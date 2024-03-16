@@ -6,6 +6,7 @@ library(ggplot2)
 library(psych)
 library(agricolae)
 library(xtable)
+library(DescTools)
 
 # Question 1 Zinc Plating
 
@@ -42,6 +43,7 @@ resp_ex$Protocol <- as.factor(resp_ex$Protocol)
 summary(resp_ex)
 # Make long format
 resp_long <- pivot_longer(resp_ex, !Protocol, names_to ="Subject", values_to="Response")
+resp_long$Subject <- as.factor(resp_long$Subject)
 #QC Data & Check Assumptions
 summary(resp_long)
 res_model <-lm(Response ~ Protocol + Subject, resp_long)
@@ -78,3 +80,15 @@ summary(aov_blocked)
 print(xtable(anova(aov_blocked)))
 summary(aov_un)
 summary(aov_subj)
+
+# Scheffe pairwise comparisons + inpatient vs outpatient contrast
+# Scheffe for all protocols, not blocked since blocking wasn't significant
+ScheffeTest(aov_un, conf.level = .99)
+# I guess?
+scheffe.test(aov_un, "Protocol", alpha = .01, console = TRUE)
+# This seems like a totally different thing? Both indicate there isn't much signif though.
+
+ScheffeTest(aov_un, contrasts = c(1, -.5, -.5), conf.level = .99)
+# I just put in the contrast as provided. It may not match up with the actual treatments
+# I'll check it against the book tomorrow.
+# And maybe try the agricolae sheffe.test instead
