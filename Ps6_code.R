@@ -65,6 +65,15 @@ ggplot() +
   geom_abline(color = "red") +
   coord_fixed()
 
+# Box Plot for good measure
+# Looks like pairwise comps should have 3+ levels? 3 & 7 in their own
+resp_plot <- ggplot(resp_long, aes(x=Protocol, y=Response)) +
+  geom_boxplot() +
+  geom_point(size=3, alpha=0.5, aes(color=Subject)) +
+  labs(title="Response x Treatment",
+       x="Protocol",
+       y="Response")
+resp_plot
 
 # Anova of model 
 res_model %>% anova()
