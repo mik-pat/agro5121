@@ -9,7 +9,147 @@ library(xtable)
 library(DescTools)
 
 # Question 1 Zinc Plating
+library(readr)
+library(tidyverse) # Loads ggplot2 and dplyr among others
+library(emmeans)
+library(multcomp)
+library(multcompView)
+library(knitr)
+library(car)
+library(MASS)
+library(readxl)
 
+
+#Question 1
+df <- read_excel(path = "~/Desktop/Applied Experimental Design/PS6/PS6Q1Data.xlsx")
+df$Vendor<- as.factor(df$Vendor)
+df$bracket<-as.factor(df$bracket)
+
+
+
+#Quality check data
+summary(df)
+
+#1a Plot plating thickness vs bracket thickness by vendor
+ggplot(df) +
+  aes(
+    x = plating_thickness,
+    y = bracket_thickness,
+    colour = Vendor
+  ) +
+  geom_point(shape = "circle", size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_manual(
+    values = c(`1` = "#0016FF",
+               `2` = "#00C19F",
+               `3` = "#FF61C3")
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+#1b Plot residuals 
+ancova_model <- lm(plating_thickness ~ Vendor + bracket_thickness, data = df)
+residuals<-residuals(ancova_model)
+rstandard <- rstandard(ancova_model)
+rstudent <- rstudent(ancova_model)
+
+# Obtain standardized residuals
+rstandard <- rstandard(ancova_model)
+
+# Obtain predicted values
+predicted <- predict(ancova_model)
+
+# Normal scores
+# Assume 'residuals' contains the standardized residuals
+residuals_mean <- mean(residuals)
+residuals_sd <- sd(residuals)
+# Calculate z-scores (standardized residuals)
+z_scores <- (residuals - residuals_mean) / residuals_sd
+# Perform quantile transformation (optional)
+normal_scores <- qnorm(pnorm(z_scores))
+
+# Plot standardized residuals against the covariate
+plot(df$bracket_thickness, rstandard, main = "Standardized Residuals vs. Covariate", xlab = "Covariate (Bracket thickness)", ylab = "Standardized Residuals")
+abline(h = 0, col = "red")
+
+# Plot standardized residuals against predicted values
+plot(predicted, rstandard, main = "Standardized Residuals vs. Predicted Values", xlab = "Predicted Values", ylab = "Standardized Residuals")
+abline(h = 0, col = "red")
+
+# Plot standardized residuals against normal scores
+plot(normal_scores, rstandard, main = "Standardized Residuals vs. Normal Scores", xlab = "Normal Scores", ylab = "Standardized Residuals")
+abline(h = 0, col = "red")
+
+#1d
+ancova_model <- lm(plating_thickness ~ Vendor + bracket_thickness, data = df)
+ancova_anova <- anova(ancova_model)
+print(ancova_anova)
+
+# Extract F-statistic and p-value from the summary
+F_statistic <- 8.1267
+p_value <- 0.01184
+
+# Set significance level
+alpha <- 0.05
+
+# Print F-statistic and p-value
+cat("F-statistic:", F_statistic, "\n")
+cat("p-value:", p_value, "\n")
+
+# Compare p-value to significance level
+if (p_value < alpha) {
+  cat("Reject the null hypothesis: There is evidence of inequality of slopes.\n")
+} else {
+  cat("Fail to reject the null hypothesis: There is no evidence of inequality of slopes.\n")
+}
+
+
+#1e
+ancova_model <- lm(plating_thickness ~ Vendor + bracket_thickness, data = df)
+ancova_anova <- anova(ancova_model)
+print(ancova_anova)
+
+# Extract F-statistic and p-value from the summary
+F_statistic <- 5.2805
+p_value <- 0.05063
+
+# Set significance level
+alpha <- 0.05
+
+# Print F-statistic and p-value
+cat("F-statistic:", F_statistic, "\n")
+cat("p-value:", p_value, "\n")
+
+# Compare p-value to significance level
+if (p_value < alpha) {
+  cat("Reject the null hypothesis: There is evidence of treatment effects being different.\n")
+} else {
+  cat("Fail to reject the null hypothesis: There is no evidence of treatment effects being different.\n")
+}
+
+#1f
+# Fit ANOVA model
+anova_model <- lm(plating_thickness ~ Vendor, data = df)
+ancova_anova <- anova(ancova_model)
+print(ancova_anova)
+
+# Extract F-statistic and p-value from the summary
+F_statistic <- 5.2805
+p_value <- 0.05063
+
+# Set significance level
+alpha <- 0.05
+
+# Print F-statistic and p-value
+cat("F-statistic:", F_statistic, "\n")
+cat("p-value:", p_value, "\n")
+
+# Compare p-value to significance level
+if (p_value < alpha) {
+  cat("Reject the null hypothesis: There is evidence of treatment effects being different.\n")
+} else {
+  cat("Fail to reject the null hypothesis: There is no evidence of treatment effects being different.\n")
+}
 
 # Question 2 Randomization
 # Assumes s=1, randomizes into 5 blocks
