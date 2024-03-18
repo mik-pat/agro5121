@@ -32,7 +32,7 @@ block_rand_2
 export_table <- xtable(block_rand_2$sketch, auto=TRUE)
 print(export_table, type="latex")
 
-# Part 3 Respiratory Exchange
+# Question 3 Respiratory Exchange
 
 resp_ex <- data.frame(Protocol = c(1,2,3,4,5,6,7,8,9),
                       Subject_1= c(.79, .84, .84, .83, .84, .83, .77, .83, .81),
