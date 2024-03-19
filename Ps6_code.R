@@ -250,16 +250,15 @@ weed$Block <- as.factor(weed$Block)
 
 # Add protocol column
 weed2 <- mutate(weed, Protocol = ifelse(WeedControl == "With" &
-                                       SoilFertility == "High",
-                                     1, 
+                                       SoilFertility == "High", 1, 
                                      ifelse(WeedControl == "Without" &
-                                                 SoilFertility == "Low",
-                                               2, 
-                                            ifelse("Weedcontrol" == "With" &
-                                                           SoilFertility == "Low",
-                                                         3, 4))))
+                                                 SoilFertility == "Low", 2, 
+                                            ifelse(WeedControl == "With" &
+                                                           SoilFertility == "Low", 3,
+                                                   ifelse(WeedControl == "Without" &
+                                                            SoilFertility == "High", 4, NA)))))
 
-
+weed2$Protocol <- as.factor(weed2$Protocol)
 weedmod <- aov(Yield ~ Protocol + Block, data = weed2)
 summary(weedmod)
 weedmod <- aov(Yield ~ WeedControl + SoilFertility + Block, data = weed)
