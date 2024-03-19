@@ -240,3 +240,13 @@ ScheffeTest(aov_un, contrasts = c(1, -.5, -.5), conf.level = .99)
 # I just put in the contrast as provided. It may not match up with the actual treatments
 # I'll check it against the book tomorrow.
 # And maybe try the agricolae sheffe.test instead
+
+# Q4 Weed Control
+weed <- read.csv("H:/My Drive/1 ExpDesign/Problem Sets/PS6/treatments_randomized.csv", header = TRUE)
+headTail(weed)
+weed$WeedControl <- as.factor(weed$WeedControl)
+weed$SoilFertility <- as.factor(weed$SoilFertility)
+weed$Block <- as.factor(weed$Block)
+
+weedmod <- aov(Yield ~ WeedControl + SoilFertility + Block, data = weed)
+summary(weedmod)
