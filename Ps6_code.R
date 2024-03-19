@@ -289,3 +289,8 @@ ggplot() +
   geom_abline(color = "red") +
   coord_fixed()
 # Eehhhhh... not great. Not terrible.
+
+# Pairs
+marge <- emmeans(weed_model, ~ Protocol, level = .99)
+marge
+pairs(marge)
