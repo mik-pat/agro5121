@@ -264,3 +264,25 @@ weedmod <- aov(Yield ~ Protocol + Block, data = weed2)
 summary(weedmod)
 weedmod <- aov(Yield ~ WeedControl + SoilFertility + Block, data = weed)
 summary(weedmod)
+# That's uhhh... really significant
+
+weed_model <-lm(Yield ~ Protocol + Block, weed2)
+plot(weed_model)
+
+# Get Residuals
+weed_stnd <- rstandard(weed_model)
+
+# Plot'em
+plot(weed_stnd)
+
+#Common variance 
+plot_weed <- plot(weed_stnd, type = "b", main = "Standardized Residuals",
+              xlab = "Observation Index", ylab = "Standardized Residuals") +
+  abline(h = 0, col = "red")
+
+# QQ for normality 
+ggplot() +
+  geom_qq(aes(sample = rstandard(weed_model))) +
+  geom_abline(color = "red") +
+  coord_fixed()
+
