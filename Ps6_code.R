@@ -268,21 +268,25 @@ summary(weedmod)
 
 weed_model <-lm(Yield ~ Protocol + Block, weed2)
 plot(weed_model)
+# QQ definitely looks a little wonky
+# Residuals vs fitted shows clear clustering?
 
 # Get Residuals
 weed_stnd <- rstandard(weed_model)
 
 # Plot'em
 plot(weed_stnd)
+# These look ok, common variance - check.
 
 #Common variance 
 plot_weed <- plot(weed_stnd, type = "b", main = "Standardized Residuals",
               xlab = "Observation Index", ylab = "Standardized Residuals") +
   abline(h = 0, col = "red")
+# Likewise, looks ok
 
 # QQ for normality 
 ggplot() +
   geom_qq(aes(sample = rstandard(weed_model))) +
   geom_abline(color = "red") +
   coord_fixed()
-
+# Eehhhhh... not great. Not terrible.
