@@ -277,30 +277,43 @@ weed_stnd <- rstandard(weed_model)
 plot(weed_stnd)
 # These look ok, common variance - check.
 # One outlier ~3.5. Filter?
+# Get that outlier
+weed3 <- weed2[-62, ]
+# New Model
+weed3_model <- lm(Yield ~ Protocol + Block, weed3)
+plot(weed3_model)
+# New std residuals
+weed3_stnd <- rstandard(weed3_model)
+plot(weed3_stnd)
 
 #Common variance 
-plot_weed <- plot(weed_stnd, type = "b", main = "Standardized Residuals",
+plot_weed <- plot(weed3_stnd, type = "b", main = "Standardized Residuals",
               xlab = "Observation Index", ylab = "Standardized Residuals") +
   abline(h = 0, col = "red")
+plot_weed
 # Likewise, looks ok
 
 # QQ for normality 
 ggplot() +
-  geom_qq(aes(sample = rstandard(weed_model))) +
+  geom_qq(aes(sample = rstandard(weed3_model))) +
   geom_abline(color = "red") +
   coord_fixed()
-# Eehhhhh... not great. Not terrible.
+# Eehhhhh... not great.
+
+
 
 # Pairs
-marge <- emmeans(weed_model, ~ Protocol, level = .99)
+marge <- emmeans(weed3_model, ~ Protocol, level = .99)
 marge
 pairs(marge)
+print(xtable(pairs(marge)))
+
 ScheffeTest(aov_weed, conf.level = .99)
 # I guess?
 scheffe.test(aov_weed, "Protocol", alpha = .01, console = TRUE)
 # This seems like a totally different thing? Both indicate there isn't much signif though.
 # I guess all one level because conf level is .99?
-aov_weed <- aov(Yield ~ Protocol, data= weed2)
+aov_weed <- aov(Yield ~ Protocol, data= weed3)
 ScheffeTest(aov_weed, contrasts = c(-.5,.5,.5,-.5), conf.level = .99)
 
 
@@ -311,4 +324,3 @@ scheffe.test(aov_weed, "Protocol", alpha = .01, console = TRUE)
 # I guess all one level because conf level is .99?
 
 ScheffeTest(aov_weed, contrasts = c(-.5, .5, .5,-.5), conf.level = .99)
-print(xtable(pairs(marge)))
