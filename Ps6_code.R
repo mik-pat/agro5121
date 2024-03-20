@@ -276,6 +276,7 @@ weed_stnd <- rstandard(weed_model)
 # Plot'em
 plot(weed_stnd)
 # These look ok, common variance - check.
+# One outlier ~3.5. Filter?
 
 #Common variance 
 plot_weed <- plot(weed_stnd, type = "b", main = "Standardized Residuals",
@@ -294,3 +295,20 @@ ggplot() +
 marge <- emmeans(weed_model, ~ Protocol, level = .99)
 marge
 pairs(marge)
+ScheffeTest(aov_weed, conf.level = .99)
+# I guess?
+scheffe.test(aov_weed, "Protocol", alpha = .01, console = TRUE)
+# This seems like a totally different thing? Both indicate there isn't much signif though.
+# I guess all one level because conf level is .99?
+aov_weed <- aov(Yield ~ Protocol, data= weed2)
+ScheffeTest(aov_weed, contrasts = c(-.5,.5,.5,-.5), conf.level = .99)
+
+
+ScheffeTest(aob_weed, conf.level = .99)
+# I guess?
+scheffe.test(aov_weed, "Protocol", alpha = .01, console = TRUE)
+# This seems like a totally different thing? Both indicate there isn't much signif though.
+# I guess all one level because conf level is .99?
+
+ScheffeTest(aov_weed, contrasts = c(-.5, .5, .5,-.5), conf.level = .99)
+print(xtable(pairs(marge)))
