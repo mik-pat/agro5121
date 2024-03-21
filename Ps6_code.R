@@ -303,7 +303,7 @@ ggplot() +
 
 
 # Pairs
-marge <- emmeans(weed3_model, ~ Protocol, level = .99)
+marge <- emmeans(weed3_model, ~ Protocol, level = .99, adjust = "scheffe")
 marge
 pairs(marge)
 print(xtable(pairs(marge)))
