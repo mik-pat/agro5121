@@ -34,7 +34,7 @@ xtable(designIII$design, caption = "Randomization of Design 3", digits = c(0,0,0
 # A - theoretical
 # B -  theoretical
 # C - all possible combinations of treatments from 7 with r = 15, calculate number of blocks
-designI <- bibd(v = 7, r = 15, k = 5, lambda = 1) # Requires a B to be specified, doesn't work
+design <- bibd(v = 7, r = 15, k = 5, lambda = 1) # Requires a B to be specified, doesn't work
 
 # Define parameters
 v <- 7  # Number of treatments
@@ -51,3 +51,9 @@ if (lambda_prime %% 1 != 0) {
   b <- (v * (r - k)) / (k * lambda_prime)  # Number of blocks (if BIBD were possible)
   print("Number of blocks (b) for BIBD:", b)
 } # lambda isn't an integer :/
+
+# Q4 
+# A - theoretical
+# B - randomization
+design4 <- bibd(v = 4, r = 3, k = 3, b = 4,lambda = 2)
+xtable(design4$design, caption = "Randomization of BIBD for Q4", digits = c(0,0,0,0))
