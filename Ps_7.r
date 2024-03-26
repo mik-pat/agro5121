@@ -61,3 +61,35 @@ xtable(design4$design, caption = "Randomization of BIBD for Q4", digits = c(0,0,
 # D - Confidence interval
 # Calculate tukey critical value
 qtukey(.95, 2, 11)
+
+# E - Difference between treatments
+# Define data (replace with your actual data)
+block_totals <- c(417, 507, 469, 577)  # Block totals (number of blocks per treatment)
+treatment_totals <- c(385, 582, 329, 674)   # Treatment totals (number of treatments per block)
+grand_mean <- 164.1667                    # Grand mean
+mean_square_error <- 3.684              # Mean square error
+
+# Calculate degrees of freedom
+n_blocks <- length(block_totals)
+n_treatments <- length(treatment_totals)
+n_total <- sum(block_totals)
+df_total <- n_total - 1
+df_blocks <- n_blocks - 1
+df_treatments <- n_treatments - 1
+df_error <- df_total - df_blocks - df_treatments
+
+# Calculate sum of squares
+SS_total <- mean_square_error * df_total
+SS_blocks <- sum((block_totals - mean(block_totals))^2) / (n_treatments)  # Mean squares method for balanced designs
+SS_treatments <- sum((treatment_totals - mean(treatment_totals))^2) / (n_blocks)  # Mean squares method for balanced designs
+
+# Calculate mean square
+MS_blocks <- SS_blocks / df_blocks
+MS_treatments <- SS_treatments / df_treatments
+
+# Calculate F-statistic
+F_statistic <- MS_treatments / MS_blocks
+
+# Calculate p-value
+p_value <- pf(F_statistic, df_treatments, df_blocks, lower.tail = FALSE)
+
