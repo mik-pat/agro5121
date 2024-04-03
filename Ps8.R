@@ -9,3 +9,11 @@ library(lme4)
 library(lmerTest)
 library(performance)
 library(dplyr)
+
+# Import the dataframe and get it set up
+df <- read.csv("H:/My Drive/1 ExpDesign/Problem Sets/PS8/berry_csv.csv", header=TRUE)
+summary(df)
+head(df)
+df$Treatment <- as.factor(df$Treatment)
+df$trt <- as.factor(df$trt)
+df$rep <- as.factor(df$rep)
