@@ -36,3 +36,12 @@ qqline(resid(model))
 
 # Residuals?
 df$Fitercept <- predict(model)
+# Run the Mixed model
+texreg(model)
+
+# Means separation
+xt <- emmeans(model, list(pairwise~Treatment), adjust = "tukey")
+
+# Table output not working. Really don't want to do it manually.
+xtable(xt, caption = 'Means Comparison for Treatments', label = NULL, align = NULL,
+       digits = 4, display = NULL, auto = FALSE)
