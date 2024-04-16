@@ -68,7 +68,7 @@ model_means_cld <- cld(object = xt,
 summary(model_means_cld)
 model_means_cld$Treatment <- reorder(model_means_cld$Treatment, desc(model_means_cld$emmean))
 summary(model_means_cld)
-model_means_cld$Signif <- c("C", "BC", "BC", "ABC", "ABC", "AB", "A")
+model_means_cld$Signif <- c("C", "BC", "ABC", "ABC", "AB", "AB", "A")
 summary(model_means_cld)
 # 
 ggplot(model_means_cld) +
