@@ -90,7 +90,21 @@ summary(model_means_cld)
 model_means_cld$Signif <- c("C", "BC", "ABC", "ABC", "AB", "AB", "A")
 umodel_means_cld$Signif <- c("C", "BC", "BC", "ABC", "ABC", "AB", "A")
 summary(model_means_cld)
-# 
+# Contrasts?
+# Contrasts?
+contrast_list <- list(
+  "Permethrin vs Water" =c(0,0,0,0,1,0,-1),
+  "Carbaryl vs Water" =c(1,0,0,0,0,0,-1),
+  "Malathion vs Water" =c(0,0,1,0,0,0,-1),
+  "Spinosad vs Water" =c(0,0,0,0,0,1,-1),
+  "Esfenvalerate vs Water" =c(0,1,0,0,0,0,-1),
+  "Neem oil vs Water" =c(0,0,0,1,0,0,-1)
+)
+contrast_water <- contrast(xtu, contrast_list)
+contrast_water
+xtable(contrast_water)
+
+#Plots
 ggplot(model_means_cld) +
  aes(x = Treatment, y = emmean, fill = Treatment) +
  geom_col() +
